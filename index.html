@@ -36,7 +36,7 @@
 <body>
     <div class="container">
         <div class="loader"></div>
-        <p>Finding a random track...</p>
+        <p>Finding a random popular track...</p>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
@@ -46,8 +46,21 @@
             // Extract just the ID part of the URI if needed
             const trackId = uri.split(':').pop();
             
-            // Redirect to the track
-            window.location.href = `https://open.spotify.com/intl-fr/track/${trackId}`;
+            // Check if user is on mobile
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Try to open Spotify app first
+                window.location.href = `spotify:track:${trackId}`;
+                
+                // Fallback to web version after a short delay if app doesn't open
+                setTimeout(function() {
+                    window.location.href = `https://open.spotify.com/intl-fr/track/${trackId}`;
+                }, 1500);
+            } else {
+                // On desktop, just use the web player
+                window.location.href = `https://open.spotify.com/intl-fr/track/${trackId}`;
+            }
         }
 
         // Load SQL.js and setup promise
