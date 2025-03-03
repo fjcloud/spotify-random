@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Spotify Track</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1DB954; /* Spotify green */
+            color: white;
+        }
+        .loader {
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 6px solid white;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loader"></div>
+        <p>Finding a random track...</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script>
+        // Function to redirect to Spotify
+        function redirectToSpotify(uri) {
+            // Extract just the ID part of the URI if needed
+            const trackId = uri.split(':').pop();
+            
+            // Redirect to the track
+            window.location.href = `https://open.spotify.com/intl-fr/track/${trackId}`;
+        }
+
+        // Load SQL.js and setup promise
+        const loadSqlJs = function(config) {
+            return new Promise((resolve, reject) => {
+                // Wait for SQL.js to be loaded
+                if (window.initSqlJs) {
+                    window.initSqlJs(config).then(resolve).catch(reject);
+                } else {
+                    // If not loaded yet, wait for it
+                    document.querySelector('script[src*="sql-wasm.js"]').addEventListener('load', function() {
+                        window.initSqlJs(config).then(resolve).catch(reject);
+                    });
+                }
+            });
+        };
+
+        // Main function to open database and redirect
+        async function findRandomTrack() {
+            try {
+                // Initialize SQL.js
+                const SQL = await loadSqlJs({
+                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                });
+                
+                // Fetch the SQLite database file
+                const response = await fetch('spotify_uris.db');
+                const arrayBuffer = await response.arrayBuffer();
+                const uInt8Array = new Uint8Array(arrayBuffer);
+                
+                // Open the database
+                const db = new SQL.Database(uInt8Array);
+                
+                // Query for a random URI
+                const result = db.exec("SELECT * FROM random_uri");
+                
+                if (result.length > 0 && result[0].values.length > 0) {
+                    const uri = result[0].values[0][0];
+                    console.log("Random URI:", uri);
+                    redirectToSpotify(uri);
+                } else {
+                    document.querySelector('.container').innerHTML = 
+                        '<p>Error: No URIs found in database.</p>';
+                }
+                
+                // Close the database
+                db.close();
+                
+            } catch (error) {
+                console.error("Error loading database:", error);
+                document.querySelector('.container').innerHTML = 
+                    `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Start the process when page loads
+        document.addEventListener('DOMContentLoaded', findRandomTrack);
+    </script>
+</body>
+</html>
