@@ -1,6 +1,6 @@
 # Spotify Random Track Selector
 
-A simple web application that lets users discover random Spotify tracks by selecting decades and languages.
+A simple web application that lets users discover random Spotify tracks by selecting decades and languages. 
 
 ## Features
 
@@ -37,3 +37,7 @@ The database contains tables for each decade/language combination with at least 
 - Utilizes IndexedDB for browser caching
 - No server-side processing required
 - Compatible with modern browsers
+
+## Credits 
+
+Based on this Spotify dataset : https://huggingface.co/datasets/bigdata-pw/Spotify
