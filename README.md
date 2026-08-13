@@ -29,7 +29,7 @@ The database contains tables for each decade/language combination with at least 
 1. On first visit, users will download and cache the database
 2. Select desired decades and languages
 3. Click "Find Random Track" to discover music
-4. The app will redirect to Spotify to play the selected track
+4. The app opens the track in Spotify without auto-playing, so you can add it to the queue
 
 ## Technical Notes
 

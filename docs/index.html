@@ -787,39 +787,12 @@
         
         function redirectToSpotify(uri) {
             const trackId = uri.split(':').pop();
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            
-            const spotifyUri = `spotify:track:${trackId}`;
+            // Use the HTTPS track page (not spotify:track:) so Spotify opens
+            // the song without auto-playing — you can add it to the queue yourself.
             const webUrl = `https://open.spotify.com/track/${trackId}`;
-            
-            setMessage("Opening in Spotify...");
-            
-            if (isMobile) {
-                window.location.href = spotifyUri;
-                setTimeout(() => { window.location.href = webUrl; }, 1500);
-            } else {
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-                
-                let appOpened = false;
-                const onBlur = () => { appOpened = true; };
-                window.addEventListener('blur', onBlur);
-                
-                iframe.src = spotifyUri;
-                
-                setTimeout(() => {
-                    window.removeEventListener('blur', onBlur);
-                    if (iframe.parentNode) document.body.removeChild(iframe);
-                    
-                    if (!appOpened) {
-                        setMessage("Opening in browser...");
-                        window.open(webUrl, '_blank');
-                    } else {
-                        setMessage("Opened in Spotify!");
-                    }
-                }, 1500);
-            }
+
+            setMessage("Opening track in Spotify...");
+            window.open(webUrl, '_blank');
         }
         
         function setProgressText(text) {
